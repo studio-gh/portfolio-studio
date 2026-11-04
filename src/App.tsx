@@ -12,7 +12,7 @@ const stageLabels: Record<Stage, string> = { "Drop In": "Adicionar materiais", E
 
 const stages: Stage[] = ["Drop In", "Evidence", "Story Plan", "Design", "Your Look", "Publish"];
 const initialProjects: Project[] = [
-  { id: "p1", title: "Fluidez — visual explorations", category: "Arte", stage: "Story Plan", updated: "Hoje", description: "Um estudo de linhas contínuas, ritmo e geometria orgânica." },
+  { id: "p1", title: "Fluidez — estudos visuais", category: "Arte", stage: "Story Plan", updated: "Hoje", description: "Um estudo de linhas contínuas, ritmo e geometria orgânica." },
   { id: "p2", title: "Story Studio", category: "Tecnologia criativa", stage: "Design", updated: "Ontem", description: "Um editor mobile-first para criar stories expressivos no Instagram." },
   { id: "p3", title: "Coleção +5521", category: "Arte", stage: "Drop In", updated: "02 nov", description: "Uma declaração visual de amor ao Rio de Janeiro." }
 ];
@@ -86,13 +86,13 @@ export default function App() {
   const [approved, setApproved] = useState<Record<string, boolean>>(() => readJSON("portfolio-studio-approved", {}));
   const [showNew, setShowNew] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newCategoria, setNewCategoria] = useState("Design");
+  const [newCategory, setNewCategory] = useState("Design");
   const [notice, setNotice] = useState("Seu espaço de trabalho está salvo neste dispositivo");
   const [notes, setNotes] = useState<Record<string, string>>(() => readJSON(NOTES_KEY, {}));
   const [assets, setAssets] = useState<Record<string, AssetMeta[]>>(() => readJSON(ASSETS_KEY, {}));
   const [templates, setTemplates] = useState<Record<string, TemplateName>>(() => readJSON(TEMPLATE_KEY, {}));
-  const [appearance, setAparência] = useState(() => readJSON(APPEARANCE_KEY, { accent: "#ff961a", paper: "#fffcf4", ink: "#2c2c2c" }));
-  const [showAparência, setShowAparência] = useState(false);
+  const [appearance, setAppearance] = useState(() => readJSON(APPEARANCE_KEY, { accent: "#ff961a", paper: "#fffcf4", ink: "#2c2c2c" }));
+  const [showAppearance, setShowAppearance] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [busy, setBusy] = useState(false);
   const current = projects.find(p => p.id === selected) ?? projects[0];
@@ -205,11 +205,11 @@ export default function App() {
           <h1>Aparência</h1>
           <p className="appearance-intro">Ajuste a linguagem visual do seu espaço de trabalho. Suas escolhas ficam salvas neste dispositivo.</p>
           <div className="appearance-card">
-            <div className="appearance-card-head"><div><b>Espaço de trabalho palette</b><span>Personalize as cores de fundo, texto e destaque</span></div><button className="text-button" onClick={() => setAparência({accent:"#ff961a",paper:"#fffcf4",ink:"#2c2c2c"})}>Restaurar padrão</button></div>
+            <div className="appearance-card-head"><div><b>Paleta do espaço de trabalho</b><span>Personalize as cores de fundo, texto e destaque</span></div><button className="text-button" onClick={() => setAppearance({accent:"#ff961a",paper:"#fffcf4",ink:"#2c2c2c"})}>Restaurar padrão</button></div>
             <div className="appearance-controls">
-              <label><span><i style={{background:appearance.paper}}/> Fundo</span><input aria-label="Fundo color" type="color" value={appearance.paper} onChange={e=>setAparência(prev=>({...prev,paper:e.target.value}))}/><code>{appearance.paper}</code></label>
-              <label><span><i style={{background:appearance.ink}}/> Texto</span><input aria-label="Texto color" type="color" value={appearance.ink} onChange={e=>setAparência(prev=>({...prev,ink:e.target.value}))}/><code>{appearance.ink}</code></label>
-              <label><span><i style={{background:appearance.accent}}/> Destaque</span><input aria-label="Destaque color" type="color" value={appearance.accent} onChange={e=>setAparência(prev=>({...prev,accent:e.target.value}))}/><code>{appearance.accent}</code></label>
+              <label><span><i style={{background:appearance.paper}}/> Fundo</span><input aria-label="Cor de fundo" type="color" value={appearance.paper} onChange={e=>setAppearance(prev=>({...prev,paper:e.target.value}))}/><code>{appearance.paper}</code></label>
+              <label><span><i style={{background:appearance.ink}}/> Texto</span><input aria-label="Cor do texto" type="color" value={appearance.ink} onChange={e=>setAppearance(prev=>({...prev,ink:e.target.value}))}/><code>{appearance.ink}</code></label>
+              <label><span><i style={{background:appearance.accent}}/> Destaque</span><input aria-label="Cor de destaque" type="color" value={appearance.accent} onChange={e=>setAppearance(prev=>({...prev,accent:e.target.value}))}/><code>{appearance.accent}</code></label>
             </div>
             <div className="appearance-sample" style={{background:appearance.paper,color:appearance.ink,borderColor:appearance.accent}}>
               <div className="eyebrow">PRÉVIA AO VIVO · GLERMENRIK</div><h2>Deixe o trabalho <em>contar sua história.</em></h2><p>Uma prévia da paleta do seu espaço de trabalho.</p><span style={{background:appearance.accent}}/>
