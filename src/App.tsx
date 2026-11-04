@@ -158,27 +158,6 @@ export default function App() {
   const currentAssets: AssetMeta[] = current ? (assets[current.id] ?? []) : [];
 
 
-  if (section === "Appearance") return <div className="app-shell">
-    <aside className="sidebar">
-      <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>BY GLERMENRIK</span></div></div>
-      <div className="workspace-label">WORKSPACE <ChevronDown size={13}/></div>
-      <button className="nav-item" onClick={() => setSection("Overview")}><Grid2X2 size={17}/> Overview</button>
-      <button className="nav-item" onClick={() => setSection("Case studies")}><FolderOpen size={17}/> Case studies</button>
-      <button className="nav-item active" onClick={() => setSection("Appearance")}><Settings2 size={17}/> Appearance</button>
-      <div className="side-bottom"><div className="help-card"><CircleHelp size={17}/><div><b>Need a hand?</b><span>Customize your studio.</span></div></div></div>
-    </aside>
-    <main className="main"><header className="topbar"><div className="crumb">Workspace <span>/</span> Appearance</div><div className="top-actions"><span className="save-state"><i/> {notice}</span><div className="avatar small">G</div></div></header>
-      <div className="content">
-        <section className="welcome"><div><div className="eyebrow">YOUR CREATIVE SPACE</div><h1>Make it<br/><em>yours.</em></h1><p>Adjust the studio palette. Changes are saved on this device.</p></div></section>
-        <section className="engine"><div className="panel-heading"><b>Color palette</b><span>LOCAL PREFERENCE</span></div><div className="appearance-grid">
-          <label>Paper <input type="color" value={appearance.paper} onChange={e => setAppearance((p: typeof appearance) => ({...p,paper:e.target.value}))}/></label>
-          <label>Ink <input type="color" value={appearance.ink} onChange={e => setAppearance((p: typeof appearance) => ({...p,paper:p.paper,ink:e.target.value}))}/></label>
-          <label>Accent <input type="color" value={appearance.accent} onChange={e => setAppearance((p: typeof appearance) => ({...p,accent:e.target.value}))}/></label>
-        </div><button className="outline-button" onClick={() => setAppearance({accent:"#ff961a",paper:"#fffcf4",ink:"#2c2c2c"})}>Restore Studio GH palette</button></section>
-      </div>
-    </main>
-  </div>;
-
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>BY GLERMENRIK</span></div></div>
