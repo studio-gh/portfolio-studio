@@ -247,7 +247,8 @@ export default function App() {
           </div>
           <div className="appearance-card workspace-settings"><b>Espaço de trabalho pessoal</b><p>Projetos, anotações e arquivos estão armazenados neste navegador. A sincronização na nuvem ainda não está disponível.</p><span className="local-state"><i/> Salvo neste dispositivo</span></div>
         </section>}
-        {(section === "Overview" || section === "Case studies") && <>\n<div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar projetos"/></div>
+        {(section === "Overview" || section === "Case studies") && <>
+<div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar projetos"/></div>
           <label className="filter-control"><SlidersHorizontal size={15}/><select value={filter} onChange={e => setFilter(e.target.value as FilterName)} aria-label="Filtrar projetos"><option>Todos os projetos</option><option>Em andamento</option><option>Prontos para publicar</option></select></label>
         </div>
         <div className="project-grid">{filtered.map((p, i) => <button key={p.id} className={`project-card ${selected === p.id ? "selected" : ""}`} onClick={() => openProject(p)} aria-label={`Abrir ${p.title}`}>
@@ -255,7 +256,8 @@ export default function App() {
           <div className="project-info"><div><h3>{p.title}</h3><p>{p.description}</p></div><div className="project-meta"><span><i className="status-dot"/> {stageLabels[p.stage]}</span><span>{p.updated}</span></div></div>
         </button>)}</div>
         {section === "Case studies" && <div className="case-preview-link"><button className="outline-button" onClick={() => openPreview(current)}><ArrowUpRight size={14}/> Ver prévia deste estudo de caso</button></div>}
-        {filtered.length === 0 && <div className="empty-results">Nenhum projeto corresponde à busca. <button className="text-button" onClick={() => {setQuery("");setFilter("Todos os projetos");}}>Limpar filtros</button></div>}\n        </>}
+        {filtered.length === 0 && <div className="empty-results">Nenhum projeto corresponde à busca. <button className="text-button" onClick={() => {setQuery("");setFilter("Todos os projetos");}}>Limpar filtros</button></div>}
+        </>}
 
         {section === "Overview" && <section className="engine">
           <div className="engine-top"><div><div className="eyebrow">MOTOR DE ESTUDOS DE CASO <span className="live-dot"/></div><h2>Do material bruto<br/>para <em>uma história pronta para compartilhar.</em></h2></div><div className="engine-note">Um processo guiado, não mais uma página em branco.<br/>Etapas claras. Uma boa história.</div></div>
