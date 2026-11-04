@@ -196,7 +196,7 @@ export default function App() {
           <p className="hint">A aprovação registra apenas uma etapa interna do rascunho. Ela não publica o estudo de caso nem cria um endereço público.</p>
         </section>}
         {section === "Overview" && <>
-          <section className="welcome"><div><div className="eyebrow">SEU ACERVO CRIATIVO</div><h1>Deixe o trabalho<br/><em>contar sua história.</em></h1><p>Um espaço para transformar materiais dispersos em estudos de caso que merecem ser lembrados.</p></div><div className="welcome-art"><div className="art-circle c1"/><div className="art-circle c2"/><div className="art-line">STUDIO GH<br/>EST. 2026</div><span>01 — 06</span></div></section>
+          <section className="welcome"><div><div className="eyebrow">SEU ACERVO CRIATIVO</div><h1>Deixe o trabalho<br/><em>contar sua história.</em></h1><p>Um espaço para transformar materiais dispersos em estudos de caso que merecem ser lembrados.</p></div><div className="welcome-art"><div className="art-circle c1"/><div className="art-circle c2"/><div className="art-line">STUDIO GH<br/>DESDE 2026</div><span>01 — 06</span></div></section>
           <section className="section-head"><div><div className="eyebrow">ESPAÇO DE TRABALHO</div><h2>Seus estudos de caso <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> Novo estudo de caso</button></section>
         </>}
         {section === "Case studies" && <section className="section-head section-head-spaced"><div><div className="eyebrow">SEUS PROJETOS</div><h2>Estudos de caso <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> Novo estudo de caso</button></section>}
@@ -255,7 +255,7 @@ export default function App() {
             </div>
           </div>
         </section>}
-        <footer><span>PORTFOLIO STUDIO <b>·</b> AN INDEPENDENT STUDIO GH PRODUCT</span><span>{notice}</span></footer>
+        <footer><span>PORTFOLIO STUDIO <b>·</b> UM PRODUTO INDEPENDENTE DO STUDIO GH</span><span>{notice}</span></footer>
       </div>
     </main>
     {showNew && <div className="modal-backdrop" onClick={()=>setShowNew(false)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowNew(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">VAMOS COMEÇAR</div><h2>Novo estudo de caso</h2><p>Dê um nome ao projeto. Você poderá construir a história ao longo do processo.</p><label>Nome do projeto<input autoFocus value={newTitle} onChange={e=>setNewTitle(e.target.value)} placeholder="Ex.: uma nova identidade visual"/></label><label>Categoria<select value={newCategory} onChange={e=>setNewCategory(e.target.value)}><option>Arte</option><option>Design</option><option>Tecnologia criativa</option></select></label><button className="primary-button full" onClick={addProject} disabled={!newTitle.trim()}>Criar estudo de caso <ArrowRight size={16}/></button></div></div>}
