@@ -183,7 +183,7 @@ export default function App() {
             <div className="preview-actions"><span className={approved[current.id] ? "approval-pill approved" : "approval-pill"}>{approved[current.id] ? "Rascunho aprovado" : "Rascunho privado"}</span><button className="outline-button" onClick={() => setSection("Case studies")}>Voltar ao editor</button></div>
           </div>
           <article className={`case-preview layout-${templates[current.id] ?? "Studio"}`}>
-            <div className="case-preview-kicker">{current.category} · GLERMENRIK / CASE STUDY</div>
+            <div className="case-preview-kicker">{current.category} · GLERMENRIK / ESTUDO DE CASO</div>
             <h1>{current.title}</h1>
             <p className="case-preview-intro">{current.description || "Uma história de projeto em construção. Adicione contexto e evidências no editor para desenvolver esta introdução."}</p>
             <div className="case-preview-rule"/>
