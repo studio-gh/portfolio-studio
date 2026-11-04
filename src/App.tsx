@@ -6,7 +6,7 @@ type Project = { id: string; title: string; category: string; stage: Stage; upda
 type AssetMeta = { id: string; name: string; type: string; size: number; };
 type TemplateName = "Bento" | "Studio" | "Editorial";
 type FilterName = "All projects" | "In progress" | "Ready to publish";
-type Section = "Overview" | "Case studies" | "Appearance";
+type Section = "Overview" | "Case studies" | "Appearance" | "Preview";
 
 const stages: Stage[] = ["Drop In", "Evidence", "Story Plan", "Design", "Your Look", "Publish"];
 const initialProjects: Project[] = [
@@ -81,6 +81,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterName>("All projects");
   const [section, setSection] = useState<Section>("Overview");
+  const [approved, setApproved] = useState<Record<string, boolean>>(() => readJSON("portfolio-studio-approved", {}));
   const [showNew, setShowNew] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("Design");
@@ -103,6 +104,7 @@ export default function App() {
   useEffect(() => { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)); }, [notes]);
   useEffect(() => { localStorage.setItem(ASSETS_KEY, JSON.stringify(assets)); }, [assets]);
   useEffect(() => { localStorage.setItem(TEMPLATE_KEY, JSON.stringify(templates)); }, [templates]);
+  useEffect(() => { localStorage.setItem("portfolio-studio-approved", JSON.stringify(approved)); }, [approved]);
   useEffect(() => { localStorage.setItem(APPEARANCE_KEY, JSON.stringify(appearance)); document.documentElement.style.setProperty("--user-accent", appearance.accent); document.documentElement.style.setProperty("--user-paper", appearance.paper); document.documentElement.style.setProperty("--user-ink", appearance.ink); }, [appearance]);
   useEffect(() => {
     const t = window.setTimeout(() => setNotice("All changes saved on this device"), 450);
@@ -115,6 +117,7 @@ export default function App() {
     setProjects(prev => [p, ...prev]); setSelected(p.id); setActive("Drop In"); setNewTitle(""); setShowNew(false); setSection("Case studies");
   }
   function openProject(p: Project) { setSelected(p.id); setActive(p.stage); setSection("Case studies"); }
+  function openPreview(p: Project) { setSelected(p.id); setSection("Preview"); }
   function advance() {
     const i = stages.indexOf(active);
     if (i < stages.length - 1) {
@@ -164,6 +167,7 @@ export default function App() {
       <div className="workspace-label">WORKSPACE <ChevronDown size={13}/></div>
       <button className={`nav-item ${section === "Overview" ? "active" : ""}`} onClick={() => setSection("Overview")}><Grid2X2 size={17}/> Overview <span className="nav-count">{projectCount}</span></button>
       <button className={`nav-item ${section === "Case studies" ? "active" : ""}`} onClick={() => setSection("Case studies")}><FolderOpen size={17}/> Case studies</button>
+      <button className={`nav-item ${section === "Preview" ? "active" : ""}`} onClick={() => openPreview(current)}><Image size={17}/> Preview current</button>
       <button className={`nav-item ${section === "Appearance" ? "active" : ""}`} onClick={() => setSection("Appearance")}><Settings2 size={17}/> Appearance</button>
       <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Tip: use the six stages to build a complete case study. Your notes and files stay on this device.")}><CircleHelp size={17}/><div><b>Need a hand?</b><span>Show a workspace tip.</span></div><ArrowUpRight size={14}/></button><div className="profile"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Personal workspace</span></div></div></div>
     </aside>
@@ -171,6 +175,24 @@ export default function App() {
     <main className="main">
       <header className="topbar"><div className="crumb">Workspace <span>/</span> {section}</div><div className="top-actions"><span className="save-state"><i/> {notice}</span><button className="icon-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" onClick={() => setShowShortcuts(true)}><Command size={16}/></button><button className="avatar small avatar-button" aria-label="Open appearance" title="Open appearance" onClick={() => setSection("Appearance")}>G</button></div></header>
       <div className="content">
+        {section === "Preview" && <section className="public-preview">
+          <div className="preview-toolbar">
+            <div><div className="eyebrow">CASE STUDY PREVIEW</div><h2>{current.title}</h2><p>This preview is private and visible only inside your workspace.</p></div>
+            <div className="preview-actions"><span className={approved[current.id] ? "approval-pill approved" : "approval-pill"}>{approved[current.id] ? "Approved draft" : "Private draft"}</span><button className="outline-button" onClick={() => setSection("Case studies")}>Back to editor</button></div>
+          </div>
+          <article className={`case-preview layout-${templates[current.id] ?? "Studio"}`}>
+            <div className="case-preview-kicker">{current.category} · GLERMENRIK / CASE STUDY</div>
+            <h1>{current.title}</h1>
+            <p className="case-preview-intro">{current.description || "A project story in progress. Add context and evidence in the editor to shape this introduction."}</p>
+            <div className="case-preview-rule"/>
+            <div className="case-preview-grid"><div><span>PROJECT STATUS</span><b>{approved[current.id] ? "Approved for design" : "In progress"}</b></div><div><span>CURRENT STAGE</span><b>{current.stage}</b></div><div><span>SOURCE MATERIAL</span><b>{currentAssets.length} files attached</b></div></div>
+            <section><div className="eyebrow">THE STORY</div><h2>The challenge</h2><p>{notes[current.id]?.trim() || "Your evidence notes will appear here when you add them in the Evidence stage. This is placeholder guidance, not extracted project content."}</p></section>
+            <section><div className="eyebrow">SOURCE MATERIAL</div><h2>Project archive</h2><div className="preview-file-list">{currentAssets.length ? currentAssets.map(file => <div key={file.id}><FileText size={16}/><span>{file.name}</span><small>{Math.max(1,Math.round(file.size/1024))} KB</small></div>) : <p>No files added yet.</p>}</div></section>
+            <div className="preview-footnote">PRIVATE PREVIEW · NOT PUBLISHED</div>
+          </article>
+          <div className="preview-actions bottom"><button className="outline-button" onClick={() => setSection("Case studies")}>Continue editing</button><button className="primary-button" onClick={() => {setApproved(prev => ({...prev,[current.id]:!prev[current.id]}));setNotice(approved[current.id] ? "Approval removed. This case remains private." : "Draft approved for the next design step. It is still private.");}}>{approved[current.id] ? "Reopen draft" : "Approve draft"}</button></div>
+          <p className="hint">Approval here records an internal draft checkpoint only. It does not publish the case study or create a public URL.</p>
+        </section>}
         {section === "Overview" && <>
           <section className="welcome"><div><div className="eyebrow">YOUR CREATIVE ARCHIVE</div><h1>Make the work<br/><em>tell its story.</em></h1><p>A thoughtful space to turn scattered material into case studies worth remembering.</p></div><div className="welcome-art"><div className="art-circle c1"/><div className="art-circle c2"/><div className="art-line">STUDIO GH<br/>EST. 2026</div><span>01 — 06</span></div></section>
           <section className="section-head"><div><div className="eyebrow">THE WORKSPACE</div><h2>Your case studies <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> New case study</button></section>
@@ -183,6 +205,7 @@ export default function App() {
           <div className={`project-visual visual-${i % 3}`}><span>{p.category.toUpperCase()}</span><div className="visual-shape">{p.title.slice(0,1).toUpperCase()}</div><ArrowUpRight size={17}/></div>
           <div className="project-info"><div><h3>{p.title}</h3><p>{p.description}</p></div><div className="project-meta"><span><i className="status-dot"/> {p.stage}</span><span>{p.updated}</span></div></div>
         </button>)}</div>
+        {section === "Case studies" && <div className="case-preview-link"><button className="outline-button" onClick={() => openPreview(current)}><ArrowUpRight size={14}/> Preview this case study</button></div>}
         {filtered.length === 0 && <div className="empty-results">No projects match this search. <button className="text-button" onClick={() => {setQuery("");setFilter("All projects");}}>Clear filters</button></div>}
 
         {section === "Overview" && <section className="engine">
