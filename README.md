@@ -113,3 +113,13 @@ The repository currently contains an early React/Vite scaffold with a dashboard,
 Not implemented yet: reliable document parsing, evidence extraction with source citations, conflict detection, target-role adaptation, editable/reorderable narrative approval, generated case-study output, cloud sync, authentication and public case publishing.
 
 The next development step is to stabilize the app shell and define the domain model and workflow states before adding more isolated UI features.
+
+
+## Idioma e localização
+
+- Idioma padrão da interface: português brasileiro (pt-BR).
+- Toda a experiência deve usar português natural do Brasil: navegação, instruções, formulários, mensagens, estados vazios, erros, confirmações e ajuda.
+- Termos em inglês só devem permanecer quando forem de uso corrente no mercado brasileiro de design e tecnologia (por exemplo: briefing, feedback, layout, dashboard e case study), sem anglicismos desnecessários.
+- A arquitetura deve manter textos da interface separados da lógica e dos dados, preparada para internacionalização (i18n) e futura opção de idioma.
+- A futura preferência de idioma da interface será independente do idioma do conteúdo produzido. Um usuário poderá navegar em português e criar um case study em inglês.
+- Não exibir seletor de idioma até que exista uma segunda tradução completa e revisada.
