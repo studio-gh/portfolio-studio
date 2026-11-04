@@ -155,6 +155,8 @@ export default function App() {
   }
   function selectStage(stage: Stage) { setActive(stage); setSection("Case studies"); }
   const projectCount = projects.length;
+  const currentAssets: AssetMeta[] = current ? (assets[current.id] ?? []) : [];
+
 
   if (section === "Appearance") return <div className="app-shell">
     <aside className="sidebar">
