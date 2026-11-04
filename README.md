@@ -76,11 +76,13 @@ Approved visual direction: contemporary editorial, minimalist, image-led and spa
 - Establish clear empty, loading, success, error and unsupported-file states.
 - Keep the sample content clearly marked as demo.
 
-### M1 — Drop In and source inventory
-- Upload multiple files and links.
-- Preserve original binary assets and metadata.
-- Show file type, size, processing status and source preview where supported.
-- Persist across sessions; local browser storage is a fallback, not cloud sync.
+### M1 — Adicionar materiais e inventário de fontes
+- Selecionar vários arquivos ou uma pasta inteira (em navegadores compatíveis).
+- Preservar arquivos originais e metadados, incluindo caminho relativo das subpastas quando fornecido pelo navegador.
+- Exibir nome, formato identificado, tamanho e estado de análise de cada item.
+- Permitir baixar e remover arquivos individualmente.
+- Persistir entre sessões no armazenamento local do navegador. Isso não é sincronização na nuvem.
+- Informar claramente que os arquivos ainda não foram lidos nem analisados até que o serviço de leitura exista.
 
 ### M2 — Read and Evidence
 - Parse a documented initial set of formats (PDF, DOCX, PPTX, XLSX, TXT, images metadata).
@@ -123,3 +125,18 @@ The next development step is to stabilize the app shell and define the domain mo
 - A arquitetura deve manter textos da interface separados da lógica e dos dados, preparada para internacionalização (i18n) e futura opção de idioma.
 - A futura preferência de idioma da interface será independente do idioma do conteúdo produzido. Um usuário poderá navegar em português e criar um case study em inglês.
 - Não exibir seletor de idioma até que exista uma segunda tradução completa e revisada.
+
+
+## Estado atual do M1 — inventário local
+
+Implementado na interface:
+- Seleção de arquivos múltiplos, arrastar e soltar e seleção de pasta inteira em navegadores compatíveis.
+- Preservação do nome original e do caminho relativo informado pelo navegador.
+- Inventário com tipo identificado por extensão/MIME, tamanho e estado explícito "Não analisado".
+- Download e remoção por arquivo.
+- Binários armazenados no IndexedDB e índice/metadados no armazenamento local do navegador.
+
+Limites atuais:
+- O navegador pode não oferecer a seleção de pasta. A seleção de múltiplos arquivos permanece disponível como alternativa.
+- A estrutura de subpastas é preservada no inventário quando o navegador informa o caminho relativo.
+- Ainda não há leitura de PDF/DOCX/PPTX/XLSX, OCR, extração de texto, análise por IA, sincronização em nuvem ou processamento compartilhado entre dispositivos.
