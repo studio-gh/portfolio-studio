@@ -14,7 +14,7 @@ const stages: Stage[] = ["Drop In", "Evidence", "Story Plan", "Design", "Your Lo
 const initialProjects: Project[] = [
   { id: "p1", title: "Fluidez — visual explorations", category: "Arte", stage: "Story Plan", updated: "Hoje", description: "Um estudo de linhas contínuas, ritmo e geometria orgânica." },
   { id: "p2", title: "Story Studio", category: "Tecnologia criativa", stage: "Design", updated: "Ontem", description: "Um editor mobile-first para criar stories expressivos no Instagram." },
-  { id: "p3", title: "+5521 Collection", category: "Art", stage: "Drop In", updated: "02 nov", description: "Uma declaração visual de amor ao Rio de Janeiro." }
+  { id: "p3", title: "Coleção +5521", category: "Arte", stage: "Drop In", updated: "02 nov", description: "Uma declaração visual de amor ao Rio de Janeiro." }
 ];
 const stageCopy: Record<Stage, string> = {
   "Drop In": "Reúna tudo em um só lugar. Adicione imagens, documentos, links e anotações.",
@@ -166,12 +166,12 @@ export default function App() {
   return <div className="app-shell">
     <aside className="sidebar">
       <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>BY GLERMENRIK</span></div></div>
-      <div className="workspace-label">WORKSPACE <ChevronDown size={13}/></div>
+      <div className="workspace-label">ESPAÇO DE TRABALHO <ChevronDown size={13}/></div>
       <button className={`nav-item ${section === "Overview" ? "active" : ""}`} onClick={() => setSection("Overview")}><Grid2X2 size={17}/> Visão geral <span className="nav-count">{projectCount}</span></button>
       <button className={`nav-item ${section === "Case studies" ? "active" : ""}`} onClick={() => setSection("Case studies")}><FolderOpen size={17}/> Estudos de caso</button>
       <button className={`nav-item ${section === "Preview" ? "active" : ""}`} onClick={() => openPreview(current)}><Image size={17}/> Prévia do projeto</button>
       <button className={`nav-item ${section === "Appearance" ? "active" : ""}`} onClick={() => setSection("Appearance")}><Settings2 size={17}/> Aparência</button>
-      <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Dica: use as etapas para construir um estudo de caso completo. Suas anotações e arquivos ficam salvos neste dispositivo.")}><CircleHelp size={17}/><div><b>Precisa de ajuda?</b><span>Ver uma dica de uso.</span></div><ArrowUpRight size={14}/></button><button className="profile profile-button" onClick={() => setSection("Appearance")} aria-label="Open personal workspace appearance settings"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Espaço de trabalho pessoal</span></div><SlidersHorizontal size={18}/></button></div>
+      <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Dica: use as etapas para construir um estudo de caso completo. Suas anotações e arquivos ficam salvos neste dispositivo.")}><CircleHelp size={17}/><div><b>Precisa de ajuda?</b><span>Ver uma dica de uso.</span></div><ArrowUpRight size={14}/></button><button className="profile profile-button" onClick={() => setSection("Appearance")} aria-label="Abrir configurações de aparência"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Espaço de trabalho pessoal</span></div><SlidersHorizontal size={18}/></button></div>
     </aside>
 
     <main className="main">
@@ -185,7 +185,7 @@ export default function App() {
           <article className={`case-preview layout-${templates[current.id] ?? "Studio"}`}>
             <div className="case-preview-kicker">{current.category} · GLERMENRIK / CASE STUDY</div>
             <h1>{current.title}</h1>
-            <p className="case-preview-intro">{current.description || "A project story in progress. Add context and evidence in the editor to shape this introduction."}</p>
+            <p className="case-preview-intro">{current.description || "Uma história de projeto em construção. Adicione contexto e evidências no editor para desenvolver esta introdução."}</p>
             <div className="case-preview-rule"/>
             <div className="case-preview-grid"><div><span>STATUS DO PROJETO</span><b>{approved[current.id] ? "Aprovado para o design" : "In progress"}</b></div><div><span>ETAPA ATUAL</span><b>{current.stage}</b></div><div><span>ARQUIVOS DE REFERÊNCIA</span><b>{currentAssets.length} arquivos adicionados</b></div></div>
             <section><div className="eyebrow">A HISTÓRIA</div><h2>O desafio</h2><p>{notes[current.id]?.trim() || "Suas anotações aparecerão aqui quando você adicioná-las na etapa de evidências. Este é um texto ilustrativo, não um conteúdo extraído do projeto."}</p></section>
@@ -220,7 +220,7 @@ export default function App() {
         {(section === "Overview" || section === "Case studies") && <>\n<div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar projetos"/></div>
           <label className="filter-control"><SlidersHorizontal size={15}/><select value={filter} onChange={e => setFilter(e.target.value as FilterName)} aria-label="Filtrar projetos"><option>Todos os projetos</option><option>Em andamento</option><option>Prontos para publicar</option></select></label>
         </div>
-        <div className="project-grid">{filtered.map((p, i) => <button key={p.id} className={`project-card ${selected === p.id ? "selected" : ""}`} onClick={() => openProject(p)} aria-label={`Open ${p.title}`}>
+        <div className="project-grid">{filtered.map((p, i) => <button key={p.id} className={`project-card ${selected === p.id ? "selected" : ""}`} onClick={() => openProject(p)} aria-label={`Abrir ${p.title}`}>
           <div className={`project-visual visual-${i % 3}`}><span>{p.category.toUpperCase()}</span><div className="visual-shape">{p.title.slice(0,1).toUpperCase()}</div><ArrowUpRight size={17}/></div>
           <div className="project-info"><div><h3>{p.title}</h3><p>{p.description}</p></div><div className="project-meta"><span><i className="status-dot"/> {stageLabels[p.stage]}</span><span>{p.updated}</span></div></div>
         </button>)}</div>
@@ -259,6 +259,6 @@ export default function App() {
       </div>
     </main>
     {showNew && <div className="modal-backdrop" onClick={()=>setShowNew(false)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowNew(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">VAMOS COMEÇAR</div><h2>Novo estudo de caso</h2><p>Dê um nome ao projeto. Você poderá construir a história ao longo do processo.</p><label>Nome do projeto<input autoFocus value={newTitle} onChange={e=>setNewTitle(e.target.value)} placeholder="Ex.: uma nova identidade visual"/></label><label>Categoria<select value={newCategoria} onChange={e=>setNewCategoria(e.target.value)}><option>Arte</option><option>Design</option><option>Tecnologia criativa</option></select></label><button className="primary-button full" onClick={addProject} disabled={!newTitle.trim()}>Criar estudo de caso <ArrowRight size={16}/></button></div></div>}
-    {showShortcuts && <div className="modal-backdrop" onClick={()=>setShowShortcuts(false)}><div className="modal shortcuts-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowShortcuts(false)} aria-label="Close"><X size={18}/></button><div className="eyebrow">GUIA RÁPIDO</div><h2>Espaço de trabalho shortcuts</h2><p>Use estas opções para navegar pelo estúdio.</p><div className="shortcut-list"><div><b>Visão geral</b><span>Voltar para a visão geral do espaço de trabalho</span></div><div><b>Estudos de caso</b><span>Ver projetos e abrir um estudo de caso</span></div><div><b>Aparência</b><span>Ajustar a paleta do estúdio</span></div><div><b>Seis etapas</b><span>Escolher uma etapa para editar o material</span></div></div><button className="primary-button full" onClick={()=>setShowShortcuts(false)}>Entendi</button></div></div>}
+    {showShortcuts && <div className="modal-backdrop" onClick={()=>setShowShortcuts(false)}><div className="modal shortcuts-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowShortcuts(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">GUIA RÁPIDO</div><h2>Espaço de trabalho shortcuts</h2><p>Use estas opções para navegar pelo estúdio.</p><div className="shortcut-list"><div><b>Visão geral</b><span>Voltar para a visão geral do espaço de trabalho</span></div><div><b>Estudos de caso</b><span>Ver projetos e abrir um estudo de caso</span></div><div><b>Aparência</b><span>Ajustar a paleta do estúdio</span></div><div><b>Seis etapas</b><span>Escolher uma etapa para editar o material</span></div></div><button className="primary-button full" onClick={()=>setShowShortcuts(false)}>Entendi</button></div></div>}
   </div>;
 }
