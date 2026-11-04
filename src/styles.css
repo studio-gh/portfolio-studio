@@ -103,3 +103,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .source-meta{font:8px 'DM Mono';color:#918b7e}
 .source-row .source-action:first-of-type{margin-left:auto}
 @media(max-width:650px){.upload-actions{width:100%}.upload-actions .outline-button{flex:1;justify-content:center}.inventory-head{align-items:flex-start;flex-direction:column}.inventory-head small{text-align:left}}
+
+/* Leitura local de fontes */
+.extracted-panel{margin-top:18px;padding-top:16px;border-top:1px solid #e3dccf}
+.extracted-panel .hint{margin-top:12px}
+.extracted-item{border:1px solid #e3dccf;border-radius:5px;background:#fffcf4;margin-top:7px}
+.extracted-item summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;cursor:pointer;font-size:10px}
+.extracted-item summary span{font-weight:600;overflow-wrap:anywhere}
+.extracted-item summary small{font:8px 'DM Mono';color:#918b7e;white-space:nowrap}
+.extracted-item pre{max-height:280px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;border-top:1px solid #e9e4d9;padding:12px;margin:0;font:10px/1.65 'DM Sans',sans-serif;color:#625d54}
+.source-meta{display:block}
+.source-row .source-action{flex:0 0 auto}
