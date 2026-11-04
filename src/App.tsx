@@ -169,7 +169,7 @@ export default function App() {
       <button className={`nav-item ${section === "Case studies" ? "active" : ""}`} onClick={() => setSection("Case studies")}><FolderOpen size={17}/> Case studies</button>
       <button className={`nav-item ${section === "Preview" ? "active" : ""}`} onClick={() => openPreview(current)}><Image size={17}/> Preview current</button>
       <button className={`nav-item ${section === "Appearance" ? "active" : ""}`} onClick={() => setSection("Appearance")}><Settings2 size={17}/> Appearance</button>
-      <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Tip: use the six stages to build a complete case study. Your notes and files stay on this device.")}><CircleHelp size={17}/><div><b>Need a hand?</b><span>Show a workspace tip.</span></div><ArrowUpRight size={14}/></button><div className="profile"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Personal workspace</span></div></div></div>
+      <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Tip: use the six stages to build a complete case study. Your notes and files stay on this device.")}><CircleHelp size={17}/><div><b>Need a hand?</b><span>Show a workspace tip.</span></div><ArrowUpRight size={14}/></button><button className="profile profile-button" onClick={() => setSection("Appearance")} aria-label="Open personal workspace appearance settings"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Personal workspace</span></div><SlidersHorizontal size={18}/></button></div>
     </aside>
 
     <main className="main">
@@ -198,7 +198,24 @@ export default function App() {
           <section className="section-head"><div><div className="eyebrow">THE WORKSPACE</div><h2>Your case studies <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> New case study</button></section>
         </>}
         {section === "Case studies" && <section className="section-head section-head-spaced"><div><div className="eyebrow">YOUR PROJECTS</div><h2>Case studies <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> New case study</button></section>}
-        <div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search your projects"/></div>
+                {section === "Appearance" && <section className="appearance-page">
+          <div className="eyebrow">PERSONAL WORKSPACE</div>
+          <h1>Appearance</h1>
+          <p className="appearance-intro">Tune the visual language of your workspace. Your choices are saved on this device.</p>
+          <div className="appearance-card">
+            <div className="appearance-card-head"><div><b>Workspace palette</b><span>Customize paper, ink and accent colors</span></div><button className="text-button" onClick={() => setAppearance({accent:"#ff961a",paper:"#fffcf4",ink:"#2c2c2c"})}>Reset defaults</button></div>
+            <div className="appearance-controls">
+              <label><span><i style={{background:appearance.paper}}/> Paper</span><input aria-label="Paper color" type="color" value={appearance.paper} onChange={e=>setAppearance(prev=>({...prev,paper:e.target.value}))}/><code>{appearance.paper}</code></label>
+              <label><span><i style={{background:appearance.ink}}/> Ink</span><input aria-label="Ink color" type="color" value={appearance.ink} onChange={e=>setAppearance(prev=>({...prev,ink:e.target.value}))}/><code>{appearance.ink}</code></label>
+              <label><span><i style={{background:appearance.accent}}/> Accent</span><input aria-label="Accent color" type="color" value={appearance.accent} onChange={e=>setAppearance(prev=>({...prev,accent:e.target.value}))}/><code>{appearance.accent}</code></label>
+            </div>
+            <div className="appearance-sample" style={{background:appearance.paper,color:appearance.ink,borderColor:appearance.accent}}>
+              <div className="eyebrow">LIVE PREVIEW · GLERMENRIK</div><h2>Make the work <em>tell its story.</em></h2><p>A little preview of your workspace palette.</p><span style={{background:appearance.accent}}/>
+            </div>
+          </div>
+          <div className="appearance-card workspace-settings"><b>Personal workspace</b><p>Projects, notes and source files are currently stored in this browser. Cloud sync is not connected yet.</p><span className="local-state"><i/> Saved on this device</span></div>
+        </section>}
+        {(section === "Overview" || section === "Case studies") && <>\n<div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search your projects"/></div>
           <label className="filter-control"><SlidersHorizontal size={15}/><select value={filter} onChange={e => setFilter(e.target.value as FilterName)} aria-label="Filter projects"><option>All projects</option><option>In progress</option><option>Ready to publish</option></select></label>
         </div>
         <div className="project-grid">{filtered.map((p, i) => <button key={p.id} className={`project-card ${selected === p.id ? "selected" : ""}`} onClick={() => openProject(p)} aria-label={`Open ${p.title}`}>
@@ -206,7 +223,7 @@ export default function App() {
           <div className="project-info"><div><h3>{p.title}</h3><p>{p.description}</p></div><div className="project-meta"><span><i className="status-dot"/> {p.stage}</span><span>{p.updated}</span></div></div>
         </button>)}</div>
         {section === "Case studies" && <div className="case-preview-link"><button className="outline-button" onClick={() => openPreview(current)}><ArrowUpRight size={14}/> Preview this case study</button></div>}
-        {filtered.length === 0 && <div className="empty-results">No projects match this search. <button className="text-button" onClick={() => {setQuery("");setFilter("All projects");}}>Clear filters</button></div>}
+        {filtered.length === 0 && <div className="empty-results">No projects match this search. <button className="text-button" onClick={() => {setQuery("");setFilter("All projects");}}>Clear filters</button></div>}\n        </>}
 
         {section === "Overview" && <section className="engine">
           <div className="engine-top"><div><div className="eyebrow">CASE STUDY ENGINE <span className="live-dot"/></div><h2>From raw material<br/>to <em>ready to share.</em></h2></div><div className="engine-note">A guided process, not another blank page.<br/>Six steps. One clear story.</div></div>
