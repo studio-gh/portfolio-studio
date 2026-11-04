@@ -139,4 +139,12 @@ Implementado na interface:
 Limites atuais:
 - O navegador pode não oferecer a seleção de pasta. A seleção de múltiplos arquivos permanece disponível como alternativa.
 - A estrutura de subpastas é preservada no inventário quando o navegador informa o caminho relativo.
-- Ainda não há leitura de PDF/DOCX/PPTX/XLSX, OCR, extração de texto, análise por IA, sincronização em nuvem ou processamento compartilhado entre dispositivos.
+- Leitura local de TXT, Markdown e CSV: disponível no navegador, com prévia do texto extraído e estado por arquivo.
+- Ainda não há leitura de PDF/DOCX/PPTX/XLSX, OCR, análise por IA, sincronização em nuvem ou processamento compartilhado entre dispositivos.
+
+
+## Estado atual da leitura local
+
+- TXT, MD, Markdown e CSV podem ser lidos localmente pelo navegador usando o arquivo original armazenado no IndexedDB.
+- O texto extraído é apresentado com o nome do arquivo de origem. A extração não é uma análise semântica e não cria evidências automaticamente.
+- Os demais formatos permanecem no inventário como não analisados ou não suportados. Não há OCR nem leitura de PDF/Office nesta etapa.
