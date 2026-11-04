@@ -5,7 +5,7 @@ type Stage = "Drop In" | "Evidence" | "Story Plan" | "Design" | "Your Look" | "P
 type Project = { id: string; title: string; category: string; stage: Stage; updated: string; description: string; };
 type AssetMeta = { id: string; name: string; type: string; size: number; };
 type TemplateName = "Bento" | "Studio" | "Editorial";
-type FilterName = "All projects" | "In progress" | "Ready to publish";
+type FilterName = "Todos os projetos" | "Em andamento" | "Prontos para publicar";
 type Section = "Overview" | "Case studies" | "Appearance" | "Preview";
 const sectionLabels: Record<Section, string> = { Overview: "Visão geral", "Case studies": "Estudos de caso", Appearance: "Aparência", Preview: "Prévia" };
 const stageLabels: Record<Stage, string> = { "Drop In": "Adicionar materiais", Evidence: "Evidências", "Story Plan": "Estrutura da história", Design: "Design", "Your Look": "Sua identidade", Publish: "Publicação" };
@@ -81,7 +81,7 @@ export default function App() {
   const [active, setActive] = useState<Stage>("Drop In");
   const [selected, setSelected] = useState<string>("p1");
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<FilterName>("All projects");
+  const [filter, setFilter] = useState<FilterName>("Todos os projetos");
   const [section, setSection] = useState<Section>("Overview");
   const [approved, setApproved] = useState<Record<string, boolean>>(() => readJSON("portfolio-studio-approved", {}));
   const [showNew, setShowNew] = useState(false);
@@ -98,7 +98,7 @@ export default function App() {
   const current = projects.find(p => p.id === selected) ?? projects[0];
   const filtered = useMemo(() => projects.filter(p => {
     const matchesQuery = (p.title + " " + p.category + " " + p.description).toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === "All projects" || (filter === "In progress" && p.stage !== "Publish") || (filter === "Ready to publish" && p.stage === "Publish");
+    const matchesFilter = filter === "Todos os projetos" || (filter === "Em andamento" && p.stage !== "Publish") || (filter === "Prontos para publicar" && p.stage === "Publish");
     return matchesQuery && matchesFilter;
   }), [projects, query, filter]);
 
@@ -187,7 +187,7 @@ export default function App() {
             <h1>{current.title}</h1>
             <p className="case-preview-intro">{current.description || "Uma história de projeto em construção. Adicione contexto e evidências no editor para desenvolver esta introdução."}</p>
             <div className="case-preview-rule"/>
-            <div className="case-preview-grid"><div><span>STATUS DO PROJETO</span><b>{approved[current.id] ? "Aprovado para o design" : "In progress"}</b></div><div><span>ETAPA ATUAL</span><b>{current.stage}</b></div><div><span>ARQUIVOS DE REFERÊNCIA</span><b>{currentAssets.length} arquivos adicionados</b></div></div>
+            <div className="case-preview-grid"><div><span>STATUS DO PROJETO</span><b>{approved[current.id] ? "Aprovado para o design" : "Em andamento"}</b></div><div><span>ETAPA ATUAL</span><b>{current.stage}</b></div><div><span>ARQUIVOS DE REFERÊNCIA</span><b>{currentAssets.length} arquivos adicionados</b></div></div>
             <section><div className="eyebrow">A HISTÓRIA</div><h2>O desafio</h2><p>{notes[current.id]?.trim() || "Suas anotações aparecerão aqui quando você adicioná-las na etapa de evidências. Este é um texto ilustrativo, não um conteúdo extraído do projeto."}</p></section>
             <section><div className="eyebrow">ARQUIVOS DE REFERÊNCIA</div><h2>Arquivos do projeto</h2><div className="preview-file-list">{currentAssets.length ? currentAssets.map(file => <div key={file.id}><FileText size={16}/><span>{file.name}</span><small>{Math.max(1,Math.round(file.size/1024))} KB</small></div>) : <p>Nenhum arquivo adicionado ainda.</p>}</div></section>
             <div className="preview-footnote">PRÉVIA PRIVADA · NÃO PUBLICADA</div>
@@ -225,7 +225,7 @@ export default function App() {
           <div className="project-info"><div><h3>{p.title}</h3><p>{p.description}</p></div><div className="project-meta"><span><i className="status-dot"/> {stageLabels[p.stage]}</span><span>{p.updated}</span></div></div>
         </button>)}</div>
         {section === "Case studies" && <div className="case-preview-link"><button className="outline-button" onClick={() => openPreview(current)}><ArrowUpRight size={14}/> Ver prévia deste estudo de caso</button></div>}
-        {filtered.length === 0 && <div className="empty-results">Nenhum projeto corresponde à busca. <button className="text-button" onClick={() => {setQuery("");setFilter("All projects");}}>Limpar filtros</button></div>}\n        </>}
+        {filtered.length === 0 && <div className="empty-results">Nenhum projeto corresponde à busca. <button className="text-button" onClick={() => {setQuery("");setFilter("Todos os projetos");}}>Limpar filtros</button></div>}\n        </>}
 
         {section === "Overview" && <section className="engine">
           <div className="engine-top"><div><div className="eyebrow">MOTOR DE ESTUDOS DE CASO <span className="live-dot"/></div><h2>Do material bruto<br/>to <em>pronta para compartilhar.</em></h2></div><div className="engine-note">Um processo guiado, não mais uma página em branco.<br/>Etapas claras. Uma boa história.</div></div>
