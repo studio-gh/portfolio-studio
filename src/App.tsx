@@ -5,14 +5,16 @@ type Stage = "Drop In" | "Evidence" | "Story Plan" | "Design" | "Your Look" | "P
 type Project = { id: string; title: string; category: string; stage: Stage; updated: string; description: string; };
 type AssetMeta = { id: string; name: string; type: string; size: number; };
 type TemplateName = "Bento" | "Studio" | "Editorial";
-type FilterName = "Todos os projetos" | "Em andamento" | "Prontos para publicar";
-type Section = "Visão geral" | "Estudos de caso" | "Aparência" | "Prévia";
+type FilterName = "All projects" | "In progress" | "Ready to publish";
+type Section = "Overview" | "Case studies" | "Appearance" | "Preview";
+const sectionLabels: Record<Section, string> = { Overview: "Visão geral", "Case studies": "Estudos de caso", Appearance: "Aparência", Preview: "Prévia" };
+const stageLabels: Record<Stage, string> = { "Drop In": "Adicionar materiais", Evidence: "Evidências", "Story Plan": "Estrutura da história", Design: "Design", "Your Look": "Sua identidade", Publish: "Publicação" };
 
 const stages: Stage[] = ["Drop In", "Evidence", "Story Plan", "Design", "Your Look", "Publish"];
 const initialProjects: Project[] = [
-  { id: "p1", title: "Fluidez — visual explorations", category: "Art", stage: "Story Plan", updated: "Today", description: "Um estudo de linhas contínuas, ritmo e geometria orgânica." },
-  { id: "p2", title: "Story Studio", category: "Creative Technology", stage: "Design", updated: "Yesterday", description: "Um editor mobile-first para criar stories expressivos no Instagram." },
-  { id: "p3", title: "+5521 Collection", category: "Art", stage: "Drop In", updated: "Nov 02", description: "Uma declaração visual de amor ao Rio de Janeiro." }
+  { id: "p1", title: "Fluidez — visual explorations", category: "Art", stage: "Story Plan", updated: "Hoje", description: "Um estudo de linhas contínuas, ritmo e geometria orgânica." },
+  { id: "p2", title: "Story Studio", category: "Creative Technology", stage: "Design", updated: "Ontem", description: "Um editor mobile-first para criar stories expressivos no Instagram." },
+  { id: "p3", title: "+5521 Collection", category: "Art", stage: "Drop In", updated: "02 nov", description: "Uma declaração visual de amor ao Rio de Janeiro." }
 ];
 const stageCopy: Record<Stage, string> = {
   "Drop In": "Reúna tudo em um só lugar. Adicione imagens, documentos, links e anotações.",
@@ -79,24 +81,24 @@ export default function App() {
   const [active, setActive] = useState<Stage>("Drop In");
   const [selected, setSelected] = useState<string>("p1");
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<FilterName>("Todos os projetos");
-  const [section, setSection] = useState<Section>("Visão geral");
+  const [filter, setFilter] = useState<FilterName>("All projects");
+  const [section, setSection] = useState<Section>("Overview");
   const [approved, setApproved] = useState<Record<string, boolean>>(() => readJSON("portfolio-studio-approved", {}));
   const [showNew, setShowNew] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newCategoria, setNewCategoria] = useState("Design");
+  const [newCategory, setNewCategoria] = useState("Design");
   const [notice, setNotice] = useState("Seu espaço de trabalho está salvo neste dispositivo");
   const [notes, setNotes] = useState<Record<string, string>>(() => readJSON(NOTES_KEY, {}));
   const [assets, setAssets] = useState<Record<string, AssetMeta[]>>(() => readJSON(ASSETS_KEY, {}));
   const [templates, setTemplates] = useState<Record<string, TemplateName>>(() => readJSON(TEMPLATE_KEY, {}));
-  const [appearance, setAparência] = useState(() => readJSON(APPEARANCE_KEY, { accent: "#ff961a", paper: "#fffcf4", ink: "#2c2c2c" }));
-  const [showAparência, setShowAparência] = useState(false);
+  const [appearance, setAppearance] = useState(() => readJSON(APPEARANCE_KEY, { accent: "#ff961a", paper: "#fffcf4", ink: "#2c2c2c" }));
+  const [showAppearance, setShowAparência] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [busy, setBusy] = useState(false);
   const current = projects.find(p => p.id === selected) ?? projects[0];
   const filtered = useMemo(() => projects.filter(p => {
     const matchesQuery = (p.title + " " + p.category + " " + p.description).toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter === "Todos os projetos" || (filter === "Em andamento" && p.stage !== "Publish") || (filter === "Prontos para publicar" && p.stage === "Publish");
+    const matchesFilter = filter === "All projects" || (filter === "In progress" && p.stage !== "Publish") || (filter === "Ready to publish" && p.stage === "Publish");
     return matchesQuery && matchesFilter;
   }), [projects, query, filter]);
 
@@ -113,11 +115,11 @@ export default function App() {
 
   function addProject() {
     if (!newTitle.trim()) return;
-    const p: Project = { id: crypto.randomUUID(), title: newTitle.trim(), category: newCategoria, stage: "Drop In", updated: "Agora", description: "A new case study in progress." };
-    setProjects(prev => [p, ...prev]); setSelected(p.id); setActive("Drop In"); setNewTitle(""); setShowNew(false); setSection("Estudos de caso");
+    const p: Project = { id: crypto.randomUUID(), title: newTitle.trim(), category: newCategoria, stage: "Drop In", updated: "Agora", description: "Um novo estudo de caso em andamento." };
+    setProjects(prev => [p, ...prev]); setSelected(p.id); setActive("Drop In"); setNewTitle(""); setShowNew(false); setSection("Case studies");
   }
   function openProject(p: Project) { setSelected(p.id); setActive(p.stage); setSection("Estudos de caso"); }
-  function openPrévia(p: Project) { setSelected(p.id); setSection("Prévia"); }
+  function openPrévia(p: Project) { setSelected(p.id); setSection("Preview"); }
   function advance() {
     const i = stages.indexOf(active);
     if (i < stages.length - 1) {
@@ -165,15 +167,15 @@ export default function App() {
     <aside className="sidebar">
       <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>BY GLERMENRIK</span></div></div>
       <div className="workspace-label">WORKSPACE <ChevronDown size={13}/></div>
-      <button className={`nav-item ${section === "Visão geral" ? "active" : ""}`} onClick={() => setSection("Visão geral")}><Grid2X2 size={17}/> Visão geral <span className="nav-count">{projectCount}</span></button>
-      <button className={`nav-item ${section === "Estudos de caso" ? "active" : ""}`} onClick={() => setSection("Estudos de caso")}><FolderOpen size={17}/> Estudos de caso</button>
-      <button className={`nav-item ${section === "Prévia" ? "active" : ""}`} onClick={() => openPrévia(current)}><Image size={17}/> Prévia current</button>
-      <button className={`nav-item ${section === "Aparência" ? "active" : ""}`} onClick={() => setSection("Aparência")}><Settings2 size={17}/> Aparência</button>
+      <button className={`nav-item ${section === "Overview" ? "active" : ""}`} onClick={() => setSection("Overview")}><Grid2X2 size={17}/> Visão geral <span className="nav-count">{projectCount}</span></button>
+      <button className={`nav-item ${section === "Case studies" ? "active" : ""}`} onClick={() => setSection("Estudos de caso")}><FolderOpen size={17}/> Estudos de caso</button>
+      <button className={`nav-item ${section === "Preview" ? "active" : ""}`} onClick={() => openPrévia(current)}><Image size={17}/> Prévia current</button>
+      <button className={`nav-item ${section === "Appearance" ? "active" : ""}`} onClick={() => setSection("Appearance")}><Settings2 size={17}/> Aparência</button>
       <div className="side-bottom"><button className="help-card" onClick={() => setNotice("Tip: use the six stages to build a complete case study. Your notes and files stay on this device.")}><CircleHelp size={17}/><div><b>Precisa de ajuda?</b><span>Ver uma dica de uso.</span></div><ArrowUpRight size={14}/></button><button className="profile profile-button" onClick={() => setSection("Aparência")} aria-label="Open personal workspace appearance settings"><div className="avatar">G</div><div><b>GLERMENRIK</b><span>Personal workspace</span></div><SlidersHorizontal size={18}/></button></div>
     </aside>
 
     <main className="main">
-      <header className="topbar"><div className="crumb">Espaço de trabalho <span>/</span> {sectionLabels[section]}</div><div className="top-actions"><span className="save-state"><i/> {notice}</span><button className="icon-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts" onClick={() => setShowShortcuts(true)}><Command size={16}/></button><button className="avatar small avatar-button" aria-label="Open appearance" title="Open appearance" onClick={() => setSection("Aparência")}>G</button></div></header>
+      <header className="topbar"><div className="crumb">Espaço de trabalho <span>/</span> {sectionLabels[section]}</div><div className="top-actions"><span className="save-state"><i/> {notice}</span><button className="icon-button" aria-label="Atalhos do teclado" title="Atalhos do teclado" onClick={() => setShowShortcuts(true)}><Command size={16}/></button><button className="avatar small avatar-button" aria-label="Abrir aparência" title="Abrir aparência" onClick={() => setSection("Aparência")}>G</button></div></header>
       <div className="content">
         {section === "Prévia" && <section className="public-preview">
           <div className="preview-toolbar">
@@ -216,7 +218,7 @@ export default function App() {
           <div className="appearance-card workspace-settings"><b>Personal workspace</b><p>Projetos, anotações e arquivos estão armazenados neste navegador. A sincronização na nuvem ainda não está disponível.</p><span className="local-state"><i/> Saved on this device</span></div>
         </section>}
         {(section === "Visão geral" || section === "Estudos de caso") && <>\n<div className="project-toolbar"><div className="search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar projetos"/></div>
-          <label className="filter-control"><SlidersHorizontal size={15}/><select value={filter} onChange={e => setFilter(e.target.value as FilterName)} aria-label="Filter projects"><option>Todos os projetos</option><option>Em andamento</option><option>Prontos para publicar</option></select></label>
+          <label className="filter-control"><SlidersHorizontal size={15}/><select value={filter} onChange={e => setFilter(e.target.value as FilterName)} aria-label="Filtrar projetos"><option value="All projects">Todos os projetos</option><option value="In progress">Em andamento</option><option value="Ready to publish">Prontos para publicar</option></select></label>
         </div>
         <div className="project-grid">{filtered.map((p, i) => <button key={p.id} className={`project-card ${selected === p.id ? "selected" : ""}`} onClick={() => openProject(p)} aria-label={`Open ${p.title}`}>
           <div className={`project-visual visual-${i % 3}`}><span>{p.category.toUpperCase()}</span><div className="visual-shape">{p.title.slice(0,1).toUpperCase()}</div><ArrowUpRight size={17}/></div>
@@ -230,7 +232,7 @@ export default function App() {
           <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active === s ? "current" : ""} ${stages.indexOf(current.stage)>i ? "done" : ""}`} onClick={() => selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i ? <Check size={13}/> : String(i+1).padStart(2,"0")}</span><b>{stageLabels[s]}</b><ArrowUpRight size={13}/></button>)}</div>
           <div className="engine-work"><div className="engine-copy"><div className="eyebrow">ETAPA {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{stageLabels[active]}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
             <div className="engine-panel">
-              {active === "Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Download file" aria-label={`Download ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remove file" aria-label={`Remove ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
+              {active === "Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
               {active === "Evidence" && <><div className="panel-heading"><b>Anotações e evidências</b><span>SALVO AUTOMATICAMENTE</span></div><textarea value={notes[current.id]??""} onChange={e=>setNotes(prev=>({...prev,[current.id]:e.target.value}))} placeholder="Registre fatos, resultados, decisões, métricas, seu papel e outras informações importantes..."/><div className="hint">Your notes are saved in this browser and will be here when you return on this device. Keep each claim connected to its original source.</div></>}
               {active === "Story Plan" && <><div className="panel-heading"><b>Estrutura da história</b><span>RASCUNHO EDITÁVEL</span></div>{["O desafio","A abordagem","O processo de criação","Os resultados"].map((x,i)=><div className="outline-row" key={x}><span>0{i+1}</span><b>{x}</b><span>{i===0?"Por que este trabalho foi importante":i===1?"A ideia e as decisões":i===2?"Processo, detalhes e execução":"Resultados e aprendizados"}</span><ArrowUpRight size={14}/></div>)}</>}
               {active === "Design" && <><div className="panel-heading"><b>Escolha uma direção visual</b><span>OPÇÕES DE LAYOUT</span></div><div className="template-grid">{(["Bento","Studio","Editorial"] as TemplateName[]).map((x,i)=><button className={templates[current.id]===x || (!templates[current.id]&&i===1)?"template chosen":"template"} key={x} onClick={()=>{setTemplates(prev=>({...prev,[current.id]:x}));setNotice(`${x} layout selected for this case study.`);}} aria-pressed={templates[current.id]===x || (!templates[current.id]&&i===1)}><div className={`template-preview t${i}`}><i/><i/><i/></div><b>{x}</b><span>{i===0?"Modular e flexível":i===1?"Visual e arejado":"Tipográfico e narrativo"}</span></button>)}</div></>}
@@ -241,10 +243,10 @@ export default function App() {
         </section>}
         {section === "Estudos de caso" && <section className="engine case-study-workbench">
           <div className="engine-top"><div><div className="eyebrow">MOTOR DE ESTUDOS DE CASO</div><h2>Build the story of<br/><em>{current.title}.</em></h2></div><div className="engine-note">Select a step to continue shaping this case study.</div></div>
-          <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active===s?"current":""} ${stages.indexOf(current.stage)>i?"done":""}`} onClick={()=>selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i?<Check size={13}/>:String(i+1).padStart(2,"0")}</span><b>{s}</b><ArrowUpRight size={13}/></button>)}</div>
-          <div className="engine-work"><div className="engine-copy"><div className="eyebrow">STEP {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{active}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
+          <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active===s?"current":""} ${stages.indexOf(current.stage)>i?"done":""}`} onClick={()=>selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i?<Check size={13}/>:String(i+1).padStart(2,"0")}</span><b>{stageLabels[s]}</b><ArrowUpRight size={13}/></button>)}</div>
+          <div className="engine-work"><div className="engine-copy"><div className="eyebrow">STEP {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{stageLabels[active]}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
             <div className="engine-panel">
-              {active==="Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Download file" onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remove file" onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
+              {active==="Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Baixar arquivo" onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remover arquivo" onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
               {active==="Evidence" && <><div className="panel-heading"><b>Anotações e evidências</b><span>SALVO AUTOMATICAMENTE</span></div><textarea value={notes[current.id]??""} onChange={e=>setNotes(prev=>({...prev,[current.id]:e.target.value}))} placeholder="Registre fatos, resultados, decisões, métricas, seu papel e outras informações importantes..."/><div className="hint">Your notes are saved in this browser on this device.</div></>}
               {active==="Story Plan" && <><div className="panel-heading"><b>Estrutura da história</b><span>RASCUNHO EDITÁVEL</span></div>{["O desafio","A abordagem","O processo de criação","Os resultados"].map((x,i)=><div className="outline-row" key={x}><span>0{i+1}</span><b>{x}</b><span>{i===0?"Por que este trabalho foi importante":i===1?"A ideia e as decisões":i===2?"Processo, detalhes e execução":"Resultados e aprendizados"}</span><ArrowUpRight size={14}/></div>)}</>}
               {active==="Design" && <><div className="panel-heading"><b>Escolha uma direção visual</b><span>OPÇÕES DE LAYOUT</span></div><div className="template-grid">{(["Bento","Studio","Editorial"] as TemplateName[]).map((x,i)=><button className={templates[current.id]===x || (!templates[current.id]&&i===1)?"template chosen":"template"} key={x} onClick={()=>setTemplates(prev=>({...prev,[current.id]:x}))}><div className={`template-preview t${i}`}><i/><i/><i/></div><b>{x}</b><span>{i===0?"Modular e flexível":i===1?"Visual e arejado":"Tipográfico e narrativo"}</span></button>)}</div></>}
