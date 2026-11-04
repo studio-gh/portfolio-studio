@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Command, Down
 
 type Stage = "Drop In" | "Evidence" | "Story Plan" | "Design" | "Your Look" | "Publish";
 type Project = { id: string; title: string; category: string; stage: Stage; updated: string; description: string; };
-type AssetMeta = { id: string; name: string; type: string; size: number; relativePath?: string; };
+type AssetMeta = { id: string; name: string; type: string; size: number; relativePath?: string; readStatus?: "not_read" | "read" | "unsupported" | "error"; extractedText?: string; extractedAt?: string; };
 type TemplateName = "Bento" | "Studio" | "Editorial";
 type FilterName = "Todos os projetos" | "Em andamento" | "Prontos para publicar";
 type Section = "Overview" | "Case studies" | "Appearance" | "Preview";
@@ -153,6 +153,54 @@ export default function App() {
       setBusy(false);
     }
   }
+  function getReadableExtension(asset: AssetMeta): string {
+    return asset.name.split(".").pop()?.toLowerCase() ?? "";
+  }
+  async function readLocalText(asset: AssetMeta) {
+    const extension = getReadableExtension(asset);
+    if (!["txt", "md", "markdown", "csv"].includes(extension)) {
+      setAssets(prev => ({
+        ...prev,
+        [current.id]: (prev[current.id] ?? []).map(item =>
+          item.id === asset.id ? { ...item, readStatus: "unsupported" } : item
+        )
+      }));
+      setNotice("Este formato ainda não tem leitura disponível.");
+      return;
+    }
+    setAssets(prev => ({
+      ...prev,
+      [current.id]: (prev[current.id] ?? []).map(item =>
+        item.id === asset.id ? { ...item, readStatus: "not_read" } : item
+      )
+    }));
+    try {
+      const blob = await getAsset(asset.id);
+      if (!blob) throw new Error("O arquivo original não está disponível neste navegador.");
+      const text = await blob.text();
+      if (!text.trim()) throw new Error("O arquivo não contém texto legível.");
+      setAssets(prev => ({
+        ...prev,
+        [current.id]: (prev[current.id] ?? []).map(item =>
+          item.id === asset.id
+            ? { ...item, readStatus: "read", extractedText: text, extractedAt: new Date().toISOString() }
+            : item
+        )
+      }));
+      setNotice(`Texto extraído de ${asset.name}`);
+    } catch (error) {
+      setAssets(prev => ({
+        ...prev,
+        [current.id]: (prev[current.id] ?? []).map(item =>
+          item.id === asset.id ? { ...item, readStatus: "error" } : item
+        )
+      }));
+      setNotice(error instanceof Error ? error.message : "Não foi possível ler este arquivo.");
+    }
+  }
+  function isLocallyReadable(asset: AssetMeta): boolean {
+    return ["txt", "md", "markdown", "csv"].includes(getReadableExtension(asset));
+  }
   function getFileKind(asset: AssetMeta): string {
     const extension = asset.name.split(".").pop()?.toLowerCase() ?? "";
     const kinds: Record<string, string> = {
@@ -289,13 +337,22 @@ export default function App() {
                     <div className="source-details">
                       <span className="source-name">{asset.name}</span>
                       {asset.relativePath && <small className="source-path">{asset.relativePath}</small>}
-                      <span className="source-meta">{getFileKind(asset)} · {formatFileSize(asset.size)} · Não analisado</span>
+                      <span className="source-meta">{getFileKind(asset)} · {formatFileSize(asset.size)} · {asset.readStatus === "read" ? "Texto extraído" : asset.readStatus === "error" ? "Falha na leitura" : asset.readStatus === "unsupported" ? "Formato ainda não suportado" : "Não analisado"}</span>
                     </div>
                     <button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button>
+                    {isLocallyReadable(asset) && <button className="source-action" title={asset.readStatus === "read" ? "Ler novamente" : "Ler arquivo"} aria-label={`Ler ${asset.name}`} onClick={()=>void readLocalText(asset)}><FileText size={14}/></button>}
                     <button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button>
                   </div>) : <div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}
                 </div>
               </>}
+              {currentAssets.some(asset => asset.readStatus === "read" && asset.extractedText) && <section className="extracted-panel">
+                <div className="panel-heading"><b>Conteúdo lido dos arquivos</b><span>EXTRAÇÃO LOCAL · SEM IA</span></div>
+                {currentAssets.filter(asset => asset.readStatus === "read" && asset.extractedText).map(asset => <details className="extracted-item" key={asset.id}>
+                  <summary><span>{asset.name}</span><small>{getFileKind(asset)}</small></summary>
+                  <pre>{asset.extractedText}</pre>
+                </details>)}
+                <p className="hint">Este conteúdo foi extraído diretamente dos arquivos. Ainda não foi interpretado, resumido nem convertido em afirmações sobre o projeto.</p>
+              </section>}
               {active === "Evidence" && <><div className="panel-heading"><b>Anotações e evidências</b><span>SALVO AUTOMATICAMENTE</span></div><textarea value={notes[current.id]??""} onChange={e=>setNotes(prev=>({...prev,[current.id]:e.target.value}))} placeholder="Registre fatos, resultados, decisões, métricas, seu papel e outras informações importantes..."/><div className="hint">Suas anotações ficam salvas neste navegador. Quando voltar usando este dispositivo, elas estarão aqui. Sempre que possível, mantenha cada informação ligada à sua fonte original.</div></>}
               {active === "Story Plan" && <><div className="panel-heading"><b>Estrutura da história</b><span>RASCUNHO EDITÁVEL</span></div>{["O desafio","A abordagem","O processo de criação","Os resultados"].map((x,i)=><div className="outline-row" key={x}><span>0{i+1}</span><b>{x}</b><span>{i===0?"Por que este trabalho foi importante":i===1?"A ideia e as decisões":i===2?"Processo, detalhes e execução":"Resultados e aprendizados"}</span><ArrowUpRight size={14}/></div>)}</>}
               {active === "Design" && <><div className="panel-heading"><b>Escolha uma direção visual</b><span>OPÇÕES DE LAYOUT</span></div><div className="template-grid">{(["Bento","Studio","Editorial"] as TemplateName[]).map((x,i)=><button className={templates[current.id]===x || (!templates[current.id]&&i===1)?"template chosen":"template"} key={x} onClick={()=>{setTemplates(prev=>({...prev,[current.id]:x}));setNotice(`${x} layout selected for this case study.`);}} aria-pressed={templates[current.id]===x || (!templates[current.id]&&i===1)}><div className={`template-preview t${i}`}><i/><i/><i/></div><b>{x}</b><span>{i===0?"Modular e flexível":i===1?"Visual e arejado":"Tipográfico e narrativo"}</span></button>)}</div></>}
@@ -337,6 +394,7 @@ export default function App() {
                       <span className="source-meta">{getFileKind(asset)} · {formatFileSize(asset.size)} · Não analisado</span>
                     </div>
                     <button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button>
+                    {isLocallyReadable(asset) && <button className="source-action" title={asset.readStatus === "read" ? "Ler novamente" : "Ler arquivo"} aria-label={`Ler ${asset.name}`} onClick={()=>void readLocalText(asset)}><FileText size={14}/></button>}
                     <button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button>
                   </div>) : <div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}
                 </div>
