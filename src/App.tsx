@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Command, Down
 
 type Stage = "Drop In" | "Evidence" | "Story Plan" | "Design" | "Your Look" | "Publish";
 type Project = { id: string; title: string; category: string; stage: Stage; updated: string; description: string; };
-type AssetMeta = { id: string; name: string; type: string; size: number; };
+type AssetMeta = { id: string; name: string; type: string; size: number; relativePath?: string; };
 type TemplateName = "Bento" | "Studio" | "Editorial";
 type FilterName = "Todos os projetos" | "Em andamento" | "Prontos para publicar";
 type Section = "Overview" | "Case studies" | "Appearance" | "Preview";
@@ -134,13 +134,43 @@ export default function App() {
     try {
       const additions: AssetMeta[] = [];
       for (const file of Array.from(list)) {
-        const id = crypto.randomUUID(); await saveAsset(id, file);
-        additions.push({ id, name: file.name, type: file.type, size: file.size });
+        const id = crypto.randomUUID();
+        await saveAsset(id, file);
+        const relativePath = (file as File & { webkitRelativePath?: string }).webkitRelativePath;
+        additions.push({
+          id,
+          name: file.name,
+          type: file.type || "application/octet-stream",
+          size: file.size,
+          ...(relativePath ? { relativePath } : {})
+        });
       }
       setAssets(prev => ({ ...prev, [current.id]: [...(prev[current.id] ?? []), ...additions] }));
       setNotice(`${additions.length} arquivo(s) salvo(s) neste dispositivo`);
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Não foi possível salvar os arquivos selecionados."); }
-    finally { setBusy(false); }
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível salvar os arquivos selecionados.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  function getFileKind(asset: AssetMeta): string {
+    const extension = asset.name.split(".").pop()?.toLowerCase() ?? "";
+    const kinds: Record<string, string> = {
+      pdf: "PDF", doc: "Documento", docx: "DOCX", ppt: "Apresentação", pptx: "PPTX",
+      xls: "Planilha", xlsx: "XLSX", csv: "CSV", txt: "Texto", md: "Markdown",
+      jpg: "Imagem", jpeg: "Imagem", png: "Imagem", gif: "Imagem", webp: "Imagem",
+      svg: "SVG", mp4: "Vídeo", mov: "Vídeo", zip: "Arquivo compactado"
+    };
+    if (kinds[extension]) return kinds[extension];
+    if (asset.type.startsWith("image/")) return "Imagem";
+    if (asset.type.startsWith("video/")) return "Vídeo";
+    if (asset.type.startsWith("audio/")) return "Áudio";
+    return "Arquivo";
+  }
+  function formatFileSize(size: number): string {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(0)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
   }
   async function downloadAsset(asset: AssetMeta) {
     try {
@@ -232,7 +262,38 @@ export default function App() {
           <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active === s ? "current" : ""} ${stages.indexOf(current.stage)>i ? "done" : ""}`} onClick={() => selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i ? <Check size={13}/> : String(i+1).padStart(2,"0")}</span><b>{stageLabels[s]}</b><ArrowUpRight size={13}/></button>)}</div>
           <div className="engine-work"><div className="engine-copy"><div className="eyebrow">ETAPA {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{stageLabels[active]}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
             <div className="engine-panel">
-              {active === "Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
+              {active === "Drop In" && <>
+                <div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}>
+                  <UploadCloud size={23}/>
+                  <b>Adicione os materiais do projeto</b>
+                  <span>Solte arquivos aqui ou selecione uma pasta inteira</span>
+                  <div className="upload-actions">
+                    <label className="outline-button">{busy ? "Salvando..." : "Escolher arquivos"}
+                      <input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/>
+                    </label>
+                    <label className="outline-button">{busy ? "Salvando..." : "Escolher pasta"}
+                      <input type="file" multiple disabled={busy} {...({ webkitdirectory: "" } as unknown as React.InputHTMLAttributes<HTMLInputElement>)} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/>
+                    </label>
+                  </div>
+                  <span className="upload-note">Os arquivos originais são guardados neste navegador. A leitura do conteúdo ainda não está disponível.</span>
+                </div>
+                <div className="inventory-head">
+                  <b>Arquivos do projeto <span>{currentAssets.length.toString().padStart(2,"0")}</span></b>
+                  <small>{currentAssets.length ? "ARQUIVOS SALVOS · AINDA NÃO ANALISADOS" : "AGUARDANDO ARQUIVOS"}</small>
+                </div>
+                <div className="source-list">
+                  {currentAssets.length ? currentAssets.map(asset=><div className="source-row" key={asset.id}>
+                    <FileText size={15}/>
+                    <div className="source-details">
+                      <span className="source-name">{asset.name}</span>
+                      {asset.relativePath && <small className="source-path">{asset.relativePath}</small>}
+                      <span className="source-meta">{getFileKind(asset)} · {formatFileSize(asset.size)} · Não analisado</span>
+                    </div>
+                    <button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button>
+                    <button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button>
+                  </div>) : <div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}
+                </div>
+              </>}
               {active === "Evidence" && <><div className="panel-heading"><b>Anotações e evidências</b><span>SALVO AUTOMATICAMENTE</span></div><textarea value={notes[current.id]??""} onChange={e=>setNotes(prev=>({...prev,[current.id]:e.target.value}))} placeholder="Registre fatos, resultados, decisões, métricas, seu papel e outras informações importantes..."/><div className="hint">Suas anotações ficam salvas neste navegador. Quando voltar usando este dispositivo, elas estarão aqui. Sempre que possível, mantenha cada informação ligada à sua fonte original.</div></>}
               {active === "Story Plan" && <><div className="panel-heading"><b>Estrutura da história</b><span>RASCUNHO EDITÁVEL</span></div>{["O desafio","A abordagem","O processo de criação","Os resultados"].map((x,i)=><div className="outline-row" key={x}><span>0{i+1}</span><b>{x}</b><span>{i===0?"Por que este trabalho foi importante":i===1?"A ideia e as decisões":i===2?"Processo, detalhes e execução":"Resultados e aprendizados"}</span><ArrowUpRight size={14}/></div>)}</>}
               {active === "Design" && <><div className="panel-heading"><b>Escolha uma direção visual</b><span>OPÇÕES DE LAYOUT</span></div><div className="template-grid">{(["Bento","Studio","Editorial"] as TemplateName[]).map((x,i)=><button className={templates[current.id]===x || (!templates[current.id]&&i===1)?"template chosen":"template"} key={x} onClick={()=>{setTemplates(prev=>({...prev,[current.id]:x}));setNotice(`${x} layout selected for this case study.`);}} aria-pressed={templates[current.id]===x || (!templates[current.id]&&i===1)}><div className={`template-preview t${i}`}><i/><i/><i/></div><b>{x}</b><span>{i===0?"Modular e flexível":i===1?"Visual e arejado":"Tipográfico e narrativo"}</span></button>)}</div></>}
@@ -246,7 +307,38 @@ export default function App() {
           <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active===s?"current":""} ${stages.indexOf(current.stage)>i?"done":""}`} onClick={()=>selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i?<Check size={13}/>:String(i+1).padStart(2,"0")}</span><b>{stageLabels[s]}</b><ArrowUpRight size={13}/></button>)}</div>
           <div className="engine-work"><div className="engine-copy"><div className="eyebrow">ETAPA {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{stageLabels[active]}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
             <div className="engine-panel">
-              {active==="Drop In" && <><div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}><UploadCloud size={23}/><b>Solte seus arquivos aqui</b><span>Os arquivos ficam armazenados neste navegador e dispositivo</span><label className="outline-button">{busy?"Salvando arquivos...":"Escolher arquivos"}<input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/></label></div><div className="source-list">{currentAssets.length?currentAssets.map(asset=><div className="source-row" key={asset.id}><FileText size={15}/><span className="source-name">{asset.name}</span><button className="source-action" title="Baixar arquivo" onClick={()=>void downloadAsset(asset)}><Download size={14}/></button><button className="source-action" title="Remover arquivo" onClick={()=>void deleteAsset(asset)}><X size={14}/></button></div>):<div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}</div></>}
+              {active === "Drop In" && <>
+                <div className="drop-zone" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();void addFiles(e.dataTransfer.files);}}>
+                  <UploadCloud size={23}/>
+                  <b>Adicione os materiais do projeto</b>
+                  <span>Solte arquivos aqui ou selecione uma pasta inteira</span>
+                  <div className="upload-actions">
+                    <label className="outline-button">{busy ? "Salvando..." : "Escolher arquivos"}
+                      <input type="file" multiple disabled={busy} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/>
+                    </label>
+                    <label className="outline-button">{busy ? "Salvando..." : "Escolher pasta"}
+                      <input type="file" multiple disabled={busy} {...({ webkitdirectory: "" } as unknown as React.InputHTMLAttributes<HTMLInputElement>)} onChange={e=>{void addFiles(e.target.files);e.currentTarget.value="";}}/>
+                    </label>
+                  </div>
+                  <span className="upload-note">Os arquivos originais são guardados neste navegador. A leitura do conteúdo ainda não está disponível.</span>
+                </div>
+                <div className="inventory-head">
+                  <b>Arquivos do projeto <span>{currentAssets.length.toString().padStart(2,"0")}</span></b>
+                  <small>{currentAssets.length ? "ARQUIVOS SALVOS · AINDA NÃO ANALISADOS" : "AGUARDANDO ARQUIVOS"}</small>
+                </div>
+                <div className="source-list">
+                  {currentAssets.length ? currentAssets.map(asset=><div className="source-row" key={asset.id}>
+                    <FileText size={15}/>
+                    <div className="source-details">
+                      <span className="source-name">{asset.name}</span>
+                      {asset.relativePath && <small className="source-path">{asset.relativePath}</small>}
+                      <span className="source-meta">{getFileKind(asset)} · {formatFileSize(asset.size)} · Não analisado</span>
+                    </div>
+                    <button className="source-action" title="Baixar arquivo" aria-label={`Baixar ${asset.name}`} onClick={()=>void downloadAsset(asset)}><Download size={14}/></button>
+                    <button className="source-action" title="Remover arquivo" aria-label={`Remover ${asset.name}`} onClick={()=>void deleteAsset(asset)}><X size={14}/></button>
+                  </div>) : <div className="empty-source"><Image size={17}/> Seus arquivos de referência aparecerão aqui</div>}
+                </div>
+              </>}
               {active==="Evidence" && <><div className="panel-heading"><b>Anotações e evidências</b><span>SALVO AUTOMATICAMENTE</span></div><textarea value={notes[current.id]??""} onChange={e=>setNotes(prev=>({...prev,[current.id]:e.target.value}))} placeholder="Registre fatos, resultados, decisões, métricas, seu papel e outras informações importantes..."/><div className="hint">Suas anotações ficam salvas neste navegador e dispositivo.</div></>}
               {active==="Story Plan" && <><div className="panel-heading"><b>Estrutura da história</b><span>RASCUNHO EDITÁVEL</span></div>{["O desafio","A abordagem","O processo de criação","Os resultados"].map((x,i)=><div className="outline-row" key={x}><span>0{i+1}</span><b>{x}</b><span>{i===0?"Por que este trabalho foi importante":i===1?"A ideia e as decisões":i===2?"Processo, detalhes e execução":"Resultados e aprendizados"}</span><ArrowUpRight size={14}/></div>)}</>}
               {active==="Design" && <><div className="panel-heading"><b>Escolha uma direção visual</b><span>OPÇÕES DE LAYOUT</span></div><div className="template-grid">{(["Bento","Studio","Editorial"] as TemplateName[]).map((x,i)=><button className={templates[current.id]===x || (!templates[current.id]&&i===1)?"template chosen":"template"} key={x} onClick={()=>setTemplates(prev=>({...prev,[current.id]:x}))}><div className={`template-preview t${i}`}><i/><i/><i/></div><b>{x}</b><span>{i===0?"Modular e flexível":i===1?"Visual e arejado":"Tipográfico e narrativo"}</span></button>)}</div></>}
