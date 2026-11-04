@@ -165,7 +165,7 @@ export default function App() {
 
   return <div className="app-shell">
     <aside className="sidebar">
-      <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>BY GLERMENRIK</span></div></div>
+      <div className="brand"><div className="brand-mark">gh.</div><div><strong>PORTFOLIO STUDIO</strong><span>POR GLERMENRIK</span></div></div>
       <div className="workspace-label">ESPAÇO DE TRABALHO <ChevronDown size={13}/></div>
       <button className={`nav-item ${section === "Overview" ? "active" : ""}`} onClick={() => setSection("Overview")}><Grid2X2 size={17}/> Visão geral <span className="nav-count">{projectCount}</span></button>
       <button className={`nav-item ${section === "Case studies" ? "active" : ""}`} onClick={() => setSection("Case studies")}><FolderOpen size={17}/> Estudos de caso</button>
@@ -201,7 +201,7 @@ export default function App() {
         </>}
         {section === "Case studies" && <section className="section-head section-head-spaced"><div><div className="eyebrow">SEUS PROJETOS</div><h2>Estudos de caso <span>{projectCount.toString().padStart(2,"0")}</span></h2></div><button className="primary-button" onClick={() => setShowNew(true)}><Plus size={16}/> Novo estudo de caso</button></section>}
                 {section === "Appearance" && <section className="appearance-page">
-          <div className="eyebrow">PERSONAL WORKSPACE</div>
+          <div className="eyebrow">ESPAÇO DE TRABALHO PESSOAL</div>
           <h1>Aparência</h1>
           <p className="appearance-intro">Ajuste a linguagem visual do seu espaço de trabalho. Suas escolhas ficam salvas neste dispositivo.</p>
           <div className="appearance-card">
@@ -228,7 +228,7 @@ export default function App() {
         {filtered.length === 0 && <div className="empty-results">Nenhum projeto corresponde à busca. <button className="text-button" onClick={() => {setQuery("");setFilter("Todos os projetos");}}>Limpar filtros</button></div>}\n        </>}
 
         {section === "Overview" && <section className="engine">
-          <div className="engine-top"><div><div className="eyebrow">MOTOR DE ESTUDOS DE CASO <span className="live-dot"/></div><h2>Do material bruto<br/>to <em>pronta para compartilhar.</em></h2></div><div className="engine-note">Um processo guiado, não mais uma página em branco.<br/>Etapas claras. Uma boa história.</div></div>
+          <div className="engine-top"><div><div className="eyebrow">MOTOR DE ESTUDOS DE CASO <span className="live-dot"/></div><h2>Do material bruto<br/>para <em>uma história pronta para compartilhar.</em></h2></div><div className="engine-note">Um processo guiado, não mais uma página em branco.<br/>Etapas claras. Uma boa história.</div></div>
           <div className="steps">{stages.map((s,i)=><button key={s} className={`step ${active === s ? "current" : ""} ${stages.indexOf(current.stage)>i ? "done" : ""}`} onClick={() => selectStage(s)}><span className="step-num">{stages.indexOf(current.stage)>i ? <Check size={13}/> : String(i+1).padStart(2,"0")}</span><b>{stageLabels[s]}</b><ArrowUpRight size={13}/></button>)}</div>
           <div className="engine-work"><div className="engine-copy"><div className="eyebrow">ETAPA {String(stages.indexOf(active)+1).padStart(2,"0")} / 06</div><h3>{stageLabels[active]}</h3><p>{stageCopy[active]}</p><button className="text-button" onClick={advance}>Ir para a próxima etapa <ArrowRight size={15}/></button></div>
             <div className="engine-panel">
@@ -259,6 +259,6 @@ export default function App() {
       </div>
     </main>
     {showNew && <div className="modal-backdrop" onClick={()=>setShowNew(false)}><div className="modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowNew(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">VAMOS COMEÇAR</div><h2>Novo estudo de caso</h2><p>Dê um nome ao projeto. Você poderá construir a história ao longo do processo.</p><label>Nome do projeto<input autoFocus value={newTitle} onChange={e=>setNewTitle(e.target.value)} placeholder="Ex.: uma nova identidade visual"/></label><label>Categoria<select value={newCategory} onChange={e=>setNewCategory(e.target.value)}><option>Arte</option><option>Design</option><option>Tecnologia criativa</option></select></label><button className="primary-button full" onClick={addProject} disabled={!newTitle.trim()}>Criar estudo de caso <ArrowRight size={16}/></button></div></div>}
-    {showShortcuts && <div className="modal-backdrop" onClick={()=>setShowShortcuts(false)}><div className="modal shortcuts-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowShortcuts(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">GUIA RÁPIDO</div><h2>Espaço de trabalho shortcuts</h2><p>Use estas opções para navegar pelo estúdio.</p><div className="shortcut-list"><div><b>Visão geral</b><span>Voltar para a visão geral do espaço de trabalho</span></div><div><b>Estudos de caso</b><span>Ver projetos e abrir um estudo de caso</span></div><div><b>Aparência</b><span>Ajustar a paleta do estúdio</span></div><div><b>Seis etapas</b><span>Escolher uma etapa para editar o material</span></div></div><button className="primary-button full" onClick={()=>setShowShortcuts(false)}>Entendi</button></div></div>}
+    {showShortcuts && <div className="modal-backdrop" onClick={()=>setShowShortcuts(false)}><div className="modal shortcuts-modal" onClick={e=>e.stopPropagation()}><button className="modal-close" onClick={()=>setShowShortcuts(false)} aria-label="Fechar"><X size={18}/></button><div className="eyebrow">GUIA RÁPIDO</div><h2>Atalhos do espaço de trabalho</h2><p>Use estas opções para navegar pelo estúdio.</p><div className="shortcut-list"><div><b>Visão geral</b><span>Voltar para a visão geral do espaço de trabalho</span></div><div><b>Estudos de caso</b><span>Ver projetos e abrir um estudo de caso</span></div><div><b>Aparência</b><span>Ajustar a paleta do estúdio</span></div><div><b>Seis etapas</b><span>Escolher uma etapa para editar o material</span></div></div><button className="primary-button full" onClick={()=>setShowShortcuts(false)}>Entendi</button></div></div>}
   </div>;
 }
