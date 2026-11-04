@@ -89,3 +89,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .project-card{cursor:pointer;pointer-events:auto;position:relative;z-index:0}
 .project-card>*{pointer-events:none}
 @media(max-width:650px){.appearance-controls{grid-template-columns:1fr}.appearance-card{padding:16px}.appearance-card-head{align-items:flex-start}.appearance-sample{padding:20px}}
+
+/* Inventário de arquivos */
+.upload-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.upload-note{max-width:440px;text-align:center;line-height:1.5;color:#9a9285}
+.inventory-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;padding-bottom:9px;border-bottom:1px solid #e3dccf}
+.inventory-head b{font-size:11px}
+.inventory-head b span{font:10px 'DM Mono';color:#a49c8e;margin-left:5px}
+.inventory-head small{font:8px 'DM Mono';letter-spacing:.08em;color:#918b7e;text-align:right}
+.source-details{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.source-details .source-name{font-size:10px;font-weight:600;overflow-wrap:anywhere}
+.source-path{font-size:9px;color:#a39b8e;overflow-wrap:anywhere}
+.source-meta{font:8px 'DM Mono';color:#918b7e}
+.source-row .source-action:first-of-type{margin-left:auto}
+@media(max-width:650px){.upload-actions{width:100%}.upload-actions .outline-button{flex:1;justify-content:center}.inventory-head{align-items:flex-start;flex-direction:column}.inventory-head small{text-align:left}}
